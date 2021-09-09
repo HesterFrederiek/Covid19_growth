@@ -60,8 +60,8 @@ def open_csv_file(path):
 
 
 if __name__ == '__main__':
-   path = 'data.csv'
-   path_newfile = 'verdoppelung.csv'
+   path = 'https://github.com/covid-19-Re/dailyRe-Data/blob/master/CHE-estimates.csv'
+   path_newfile = 'https://github.com/HesterFrederiek/Covid19_growth/CHE-estimates_with_growth.csv'
    append_file(path, path_newfile, T=4.8)
 
 
