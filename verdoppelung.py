@@ -4,6 +4,8 @@ sources:    Formulas:
             Estimate of generation time T:
             https://twitter.com/C_Althaus/status/1327572765784858625
             https://twitter.com/C_Althaus/status/1327567433142558725/photo/1
+            data source:
+            https://github.com/covid-19-Re/dailyRe-Data/blob/master/CHE-estimates.csv
 """
 
 
