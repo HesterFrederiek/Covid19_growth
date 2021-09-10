@@ -7,11 +7,11 @@ sources:    Formulas:
             data source:
             https://github.com/covid-19-Re/dailyRe-Data/blob/master/CHE-estimates.csv
 """
-
-
+import credentials
+import os
+import requests
 import numpy as np
 import pandas as pd
-
 
 
 # growth rate r=(R-1)/T,  generation time T, abgeschätzt auf 4.8 (tweets Althaus)
@@ -19,6 +19,7 @@ def growth_rate(R, T=4.8):
     return (R-1)/T
 
 
+# add growth rate columns to the data frame
 def add_growth_rate(df, T=4.8):
     df['Mittlere growth rate'] = growth_rate(df['Mittlere effektive Reproduktionszahl'], T)
     df['Obere Grenze growth rate'] = growth_rate(df['Obere Grenze der effektiven Reproduktionszahl'], T)
@@ -31,6 +32,7 @@ def verdoppelung(r):
     return np.where(r > 0, np.log(2)/r, None)
 
 
+# add verdoppelung columns to the data frame
 def add_verdoppelung(df, T=4.8):
     df = add_growth_rate(df, T)
     df['Mittlere Verdoppelung'] = verdoppelung(df['Mittlere growth rate'])
@@ -39,31 +41,28 @@ def add_verdoppelung(df, T=4.8):
     return df
 
 
+# export csv file with added growth rate and doubling time columns
 def return_data(filename, df, T=4.8):
     df = add_verdoppelung(df, T)
     df.to_csv(filename)
 
 
-def append_file(old_filename, new_filename, T=4.8):
-    df = pd.read_csv(old_filename, sep=';')
-    return_data(new_filename, df, T)
-
-
-def filter_basel(df):
-    return df[df['Region'] == 'BS']
-
-
-def open_csv_file(path):
-    '''
-    turn csv file at path into dataframe
-    '''
-    with open(path, 'r') as f:
-        return pd.read_csv(f, sep=';')
-
-
 if __name__ == '__main__':
-   path = 'https://raw.githubusercontent.com/covid-19-Re/dailyRe-Data/master/CHE-estimates.csv'
-   path_newfile = 'https://github.com/HesterFrederiek/Covid19_growth/CHE-estimates_with_growth.csv'
-   append_file(path, path_newfile, T=4.8)
+    print(f"Getting today's data url...")
+    url = 'https://raw.githubusercontent.com/covid-19-Re/dailyRe-Data/master/CHE-estimates.csv'
+    req = requests.get(url, proxies=credentials.proxies)
+    with open(os.path.join(credentials.path, credentials.file_name), 'wb') as f:
+        f.write(req.content)
+    print(f'Reading current csv into data frame...')
+    df_R = pd.read_csv(credentials.file_name)
+    print(df_R)
+    print(f"Rename columns...")
+    df_R.rename(columns={'median_R_mean': 'Mittlere effektive Reproduktionszahl', 'median_R_highHPD': 'Obere Grenze der effektiven Reproduktionszahl', 'median_R_lowHPD': 'Untere Grenze der effektiven Reproduktionszahl'}, inplace=True)
+    print(f"Extending file...")
+    export_file_name = os.path.join(credentials.path, credentials.file_name_new)
+    return_data(export_file_name, df=df_R, T=4.8)
+
+
+
 
 
