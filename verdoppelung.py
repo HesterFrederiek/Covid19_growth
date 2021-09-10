@@ -55,11 +55,12 @@ if __name__ == '__main__':
         f.write(req.content)
     print(f'Reading current csv into data frame...')
     df_R = pd.read_csv(credentials.file_name)
-R    print(f"Rename columns...")
+    print(f"Rename columns...")
     df_R.rename(columns={'median_R_mean': 'Mittlere effektive Reproduktionszahl', 'median_R_highHPD': 'Obere Grenze der effektiven Reproduktionszahl', 'median_R_lowHPD': 'Untere Grenze der effektiven Reproduktionszahl'}, inplace=True)
     print(f"Extending file...")
     export_file_name = os.path.join(credentials.path, credentials.file_name_new)
     return_data(export_file_name, df=df_R, T=4.8)
+
 
 
 
